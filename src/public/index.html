@@ -1,148 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Update</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 4px;
-            background-color: #e8f5e9;
-        }
-        .error {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Update Metrics</title>
 </head>
 <body>
-    <div class="container">
-        <h1>Update Attendance Data</h1>
-        <form id="attendanceForm">
-            <div class="form-group">
-                <label for="attentive">Attentive Students:</label>
-                <input type="number" id="attentive" name="attentive" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="nonAttentive">Non-Attentive Students:</label>
-                <input type="number" id="nonAttentive" name="nonAttentive" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="camOff">Camera Off:</label>
-                <input type="number" id="camOff" name="camOff" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="notDetected">Not Detected:</label>
-                <input type="number" id="notDetected" name="notDetected" min="0" required>
-            </div>
-            <button type="submit">Update Attendance</button>
-        </form>
-        <div id="result" class="result" style="display: none;"></div>
-    </div>
+  <h1>Attendance Data</h1>
+  <form id="attendanceForm">
+    <label>Attentive: <input type="number" id="attentive" required></label><br>
+    <label>Non-Attentive: <input type="number" id="nonAttentive" required></label><br>
+    <label>Camera Off: <input type="number" id="camOff" required></label><br>
+    <label>Not Detected: <input type="number" id="notDetected" required></label><br>
+    <button type="submit">Submit Attendance</button>
+  </form>
 
-    <script>
-        document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = {
-                attentive: parseInt(document.getElementById('attentive').value),
-                nonAttentive: parseInt(document.getElementById('nonAttentive').value),
-                camOff: parseInt(document.getElementById('camOff').value),
-                notDetected: parseInt(document.getElementById('notDetected').value)
-            };
+  <hr>
 
-            try {
-                const response = await fetch('/api/attendance', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                });
+  <h1>Performance Data</h1>
+  <form id="performanceForm">
+    <label>High Performance: <input type="number" id="highPerformance" required></label><br>
+    <label>Need Attention: <input type="number" id="needAttention" required></label><br>
+    <button type="submit">Submit Performance</button>
+  </form>
 
-                const result = await response.json();
-                const resultDiv = document.getElementById('result');
-                resultDiv.style.display = 'block';
+  <script>
+    const BACKEND_URL = 'http://localhost:3000';
 
-                if (result.success) {
-                    resultDiv.className = 'result';
-                    resultDiv.innerHTML = `
-                        <h3>✅ Data Updated Successfully!</h3>
-                        <p>Attentive: ${result.data.attentive}</p>
-                        <p>Non-Attentive: ${result.data.nonAttentive}</p>
-                        <p>Camera Off: ${result.data.camOff}</p>
-                        <p>Not Detected: ${result.data.notDetected}</p>
-                        <p>Total Students: ${result.data.totalStudents}</p>
-                        <p>Average Attentiveness: ${result.data.averageAttentiveness.toFixed(2)}%</p>
-                    `;
-                } else {
-                    resultDiv.className = 'result error';
-                    resultDiv.innerHTML = `<h3>❌ Error: ${result.error}</h3>`;
-                }
-            } catch (error) {
-                const resultDiv = document.getElementById('result');
-                resultDiv.style.display = 'block';
-                resultDiv.className = 'result error';
-                resultDiv.innerHTML = `<h3>❌ Error: ${error.message}</h3>`;
-            }
-        });
+    document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-        // Load current data when page loads
-        window.addEventListener('load', async () => {
-            try {
-                const response = await fetch('/api/attendance');
-                const data = await response.json();
-                
-                document.getElementById('attentive').value = data.attentive;
-                document.getElementById('nonAttentive').value = data.nonAttentive;
-                document.getElementById('camOff').value = data.camOff;
-                document.getElementById('notDetected').value = data.notDetected;
-            } catch (error) {
-                console.error('Error loading current data:', error);
-            }
-        });
-    </script>
+      const data = {
+        attentive: parseInt(document.getElementById('attentive').value),
+        nonAttentive: parseInt(document.getElementById('nonAttentive').value),
+        camOff: parseInt(document.getElementById('camOff').value),
+        notDetected: parseInt(document.getElementById('notDetected').value),
+      };
+
+      const response = await fetch(`${BACKEND_URL}/api/attendance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      alert(`Attendance updated: ${result.success}`);
+    });
+
+    document.getElementById('performanceForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const data = {
+        highPerformance: parseInt(document.getElementById('highPerformance').value),
+        needAttention: parseInt(document.getElementById('needAttention').value),
+      };
+
+      const response = await fetch(`${BACKEND_URL}/api/highPerformance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      alert(`Performance updated: ${result.success}`);
+    });
+  </script>
 </body>
-</html> 
+</html>
